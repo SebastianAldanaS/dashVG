@@ -208,25 +208,36 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 retro-grid min-h-screen p-6">
       {/* Header del Dashboard */}
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Dashboard de Gaming
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          Estadísticas y análisis de videojuegos
-        </p>
+      <div className="text-center relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl"></div>
+        <div className="relative gaming-card rounded-3xl p-8 mb-8">
+          <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-4 neon-text">
+            GAMING DASHBOARD
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-400 font-mono uppercase tracking-widest">
+            &gt;&gt; RETRO ANALYTICS SYSTEM &lt;&lt;
+          </p>
+          <div className="mt-4 flex justify-center space-x-4">
+            <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+            <span className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse delay-75"></span>
+            <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse delay-150"></span>
+          </div>
+        </div>
       </div>
 
       {/* Grid de gráficas */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         
         {/* Gráfica de barras - Juegos por Género */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Distribución por Género
-          </h3>
+        <div className="gaming-card rounded-2xl shadow-2xl p-6 border-2 border-blue-500/20 dark:border-purple-500/30 gaming-glow">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+              🎮 DISTRIBUCIÓN POR GÉNERO
+            </h3>
+            <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={genreData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -254,10 +265,13 @@ const Dashboard = () => {
         </div>
 
         {/* Gráfica de pastel - Distribución de Plataformas */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Distribución de Plataformas
-          </h3>
+        <div className="gaming-card rounded-2xl shadow-2xl p-6 border-2 border-green-500/20 dark:border-emerald-500/30 gaming-glow">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+              🖥️ PLATAFORMAS
+            </h3>
+            <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -287,10 +301,13 @@ const Dashboard = () => {
         </div>
 
         {/* Gráfica de líneas - Juegos por Año de Lanzamiento */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Línea de Tiempo de Lanzamientos
-          </h3>
+        <div className="gaming-card rounded-2xl shadow-2xl p-6 border-2 border-purple-500/20 dark:border-violet-500/30 gaming-glow">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-violet-500 bg-clip-text text-transparent">
+              📅 TIMELINE RETRO
+            </h3>
+            <div className="w-4 h-4 bg-purple-500 rounded-full animate-pulse"></div>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={yearData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -328,10 +345,13 @@ const Dashboard = () => {
         </div>
 
         {/* Gráfica de barras - Multijugador vs Singleplayer */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Análisis Multijugador
-          </h3>
+        <div className="gaming-card rounded-2xl shadow-2xl p-6 border-2 border-pink-500/20 dark:border-rose-500/30 gaming-glow">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
+              👥 MODO MULTIJUGADOR
+            </h3>
+            <div className="w-4 h-4 bg-pink-500 rounded-full animate-pulse"></div>
+          </div>
           
           {/* Visualización con barras CSS */}
           {multiplayerData.length > 0 && (
@@ -409,28 +429,52 @@ const Dashboard = () => {
 
       {/* Estadísticas adicionales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-          <h4 className="text-lg font-semibold mb-2">Total de Géneros</h4>
-          <p className="text-3xl font-bold">{genreData.length}</p>
-          <p className="text-blue-100 text-sm">En el top 8</p>
+        <div className="bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500 rounded-2xl p-6 text-white gaming-glow border-2 border-blue-400/30 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
+          <div className="relative">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-lg font-bold uppercase tracking-wider">🎯 GÉNEROS</h4>
+              <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+            </div>
+            <p className="text-4xl font-black mb-1 neon-text">{genreData.length}</p>
+            <p className="text-blue-100 text-sm font-mono">TOP CATEGORIES</p>
+          </div>
         </div>
         
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
-          <h4 className="text-lg font-semibold mb-2">Plataformas Principales</h4>
-          <p className="text-3xl font-bold">{platformData.length}</p>
-          <p className="text-green-100 text-sm">Más populares</p>
+        <div className="bg-gradient-to-br from-green-500 via-green-600 to-emerald-500 rounded-2xl p-6 text-white gaming-glow border-2 border-green-400/30 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
+          <div className="relative">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-lg font-bold uppercase tracking-wider">🖥️ PLATAFORMAS</h4>
+              <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+            </div>
+            <p className="text-4xl font-black mb-1 neon-text">{platformData.length}</p>
+            <p className="text-green-100 text-sm font-mono">MAIN SYSTEMS</p>
+          </div>
         </div>
         
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
-          <h4 className="text-lg font-semibold mb-2">Años Analizados</h4>
-          <p className="text-3xl font-bold">15</p>
-          <p className="text-purple-100 text-sm">Últimos años</p>
+        <div className="bg-gradient-to-br from-purple-500 via-purple-600 to-violet-500 rounded-2xl p-6 text-white gaming-glow border-2 border-purple-400/30 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
+          <div className="relative">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-lg font-bold uppercase tracking-wider">📅 AÑOS</h4>
+              <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+            </div>
+            <p className="text-4xl font-black mb-1 neon-text">15</p>
+            <p className="text-purple-100 text-sm font-mono">TIME SPAN</p>
+          </div>
         </div>
 
-        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg p-6 text-white">
-          <h4 className="text-lg font-semibold mb-2">Juegos Analizados</h4>
-          <p className="text-3xl font-bold">200</p>
-          <p className="text-indigo-100 text-sm">Para estadísticas</p>
+        <div className="bg-gradient-to-br from-pink-500 via-pink-600 to-rose-500 rounded-2xl p-6 text-white gaming-glow border-2 border-pink-400/30 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
+          <div className="relative">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-lg font-bold uppercase tracking-wider">🎮 JUEGOS</h4>
+              <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+            </div>
+            <p className="text-4xl font-black mb-1 neon-text">200</p>
+            <p className="text-pink-100 text-sm font-mono">ANALYZED</p>
+          </div>
         </div>
       </div>
     </div>

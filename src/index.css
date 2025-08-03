@@ -1,9 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: 'Rajdhani', 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', monospace;
+  }
+}
+
+@layer components {
+  /* Efectos gaming */
+  .gaming-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .gaming-glow:hover {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+    transform: translateY(-2px);
+  }
+  
+  .gaming-border {
+    border: 2px solid;
+    border-image: linear-gradient(45deg, #3b82f6, #8b5cf6, #ef4444, #10b981) 1;
+    position: relative;
+  }
+  
+  .gaming-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ef4444, #10b981);
+    border-radius: inherit;
+    z-index: -1;
+    animation: gaming-pulse 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes gaming-pulse {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  .retro-grid {
+    background-image: 
+      linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .dark .retro-grid {
+    background-image: 
+      linear-gradient(rgba(139, 92, 246, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139, 92, 246, 0.2) 1px, transparent 1px);
+  }
+  
+  .neon-text {
+    text-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      0 0 20px currentColor;
+  }
+  
+  .gaming-card {
+    background: linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.1) 0%, 
+      rgba(139, 92, 246, 0.1) 50%, 
+      rgba(239, 68, 68, 0.1) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  
+  .dark .gaming-card {
+    background: linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.2) 0%, 
+      rgba(139, 92, 246, 0.2) 50%, 
+      rgba(239, 68, 68, 0.2) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.4);
   }
 }

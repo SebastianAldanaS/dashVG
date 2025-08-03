@@ -1,0 +1,63 @@
+Quiero que me ayudes a crear un dashboard de videojuegos en React usando la API pública de RAWG.
+
+    Requisitos generales:
+        El proyecto debe estar hecho con React usando Vite como empaquetador.
+
+        Estilos con Tailwind CSS (moderno, responsivo, modo claro/oscuro si es posible).
+
+        Consumir datos en tiempo real desde la API de RAWG.io (https://rawg.io/apidocs).
+
+        No se debe usar backend ni base de datos, todo es frontend.
+
+     Estructura del proyecto:
+        src/api: funciones para consultar la API.
+
+        src/components: tarjetas de juegos, buscadores, filtros, botones, gráficas.
+
+        src/pages: vistas principales (Home, GameDetail).
+
+        src/App.jsx: configuración principal de rutas y layout.
+
+        Uso de React Router para navegación entre páginas.
+
+        Uso de Axios para las peticiones.
+
+        Uso de Recharts para mostrar estadísticas gráficas.
+
+    Funcionalidades específicas:
+
+    Home Page:
+
+        Lista de juegos populares.
+
+        Buscador por nombre.
+
+        Filtro por género, plataforma o fecha.
+
+    Página de detalles del juego:
+
+        Nombre, imagen, descripción, géneros, plataformas y rating.
+
+        Mostrar screenshots o trailer si la API lo permite.
+
+    Dashboard estadístico:
+
+        Gráfica de juegos por género.
+
+        Gráfica de juegos por plataforma o calificación promedio.
+
+    Autenticación:
+        La API de RAWG requiere una API key. El sistema debe obtenerla desde un archivo .env y usarla en cada petición.
+
+     Librerías necesarias:
+        axios
+
+        react-router-dom
+
+        recharts
+
+        tailwindcss (con configuración base para Vite)
+
+     Objetivo final:
+
+        Quiero tener un dashboard profesional, visual y funcional que pueda mostrar en mi portafolio, usando React + Tailwind + datos reales de la API de RAWG. No se debe requerir backend ni almacenamiento externo.

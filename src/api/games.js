@@ -35,7 +35,13 @@ export const searchGames = async (query, params = {}) => {
 // Obtener detalles de un juego específico
 export const getGameDetails = async (id) => {
   try {
-    const response = await apiClient.get(`/games/${id}`);
+    const response = await apiClient.get(`/games/${id}`, {
+      params: {
+        // Aunque RAWG no tiene traducción automática, esto puede ayudar con algunos metadatos
+        locale: 'es-ES',
+        language: 'es'
+      }
+    });
     return response.data;
   } catch (error) {
     throw new Error('Error fetching game details: ' + error.message);
@@ -90,5 +96,20 @@ export const getGamesByGenre = async () => {
     return gamesByGenre;
   } catch (error) {
     throw new Error('Error fetching games by genre: ' + error.message);
+  }
+};
+
+// Obtener una muestra más grande de juegos para análisis detallado
+export const getGamesForAnalysis = async () => {
+  try {
+    const response = await apiClient.get('/games', {
+      params: {
+        page_size: 200, // Muestra más grande
+        ordering: '-rating',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Error fetching games for analysis: ' + error.message);
   }
 };

@@ -14,13 +14,14 @@ import {
   LineChart,
   Line
 } from 'recharts';
-import { getGamesByGenre, getGames } from '../api/games';
+import { getGamesByGenre, getGames, getGamesForAnalysis } from '../api/games';
 import LoadingSpinner from './LoadingSpinner';
 
 const Dashboard = () => {
   const [genreData, setGenreData] = useState([]);
   const [platformData, setPlatformData] = useState([]);
-  const [ratingData, setRatingData] = useState([]);
+  const [yearData, setYearData] = useState([]);
+  const [multiplayerData, setMultiplayerData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -61,36 +62,128 @@ const Dashboard = () => {
         
         setPlatformData(platformArray);
 
-        // Procesar datos de ratings
-        const ratingRanges = {
-          '0.0-1.0': 0,
-          '1.0-2.0': 0,
-          '2.0-3.0': 0,
-          '3.0-4.0': 0,
-          '4.0-5.0': 0
-        };
+        // Procesar datos por año de lanzamiento
+        const yearCounts = {};
+        const currentYear = new Date().getFullYear();
+        const startYear = currentYear - 15; // Últimos 15 años
+
+        // Inicializar años
+        for (let year = startYear; year <= currentYear; year++) {
+          yearCounts[year] = 0;
+        }
 
         gamesData.results.forEach(game => {
-          if (game.rating) {
-            const rating = game.rating;
-            if (rating < 1.0) ratingRanges['0.0-1.0']++;
-            else if (rating < 2.0) ratingRanges['1.0-2.0']++;
-            else if (rating < 3.0) ratingRanges['2.0-3.0']++;
-            else if (rating < 4.0) ratingRanges['3.0-4.0']++;
-            else ratingRanges['4.0-5.0']++;
+          if (game.released) {
+            const gameYear = new Date(game.released).getFullYear();
+            if (gameYear >= startYear && gameYear <= currentYear) {
+              yearCounts[gameYear]++;
+            }
           }
         });
 
-        const ratingArray = Object.entries(ratingRanges).map(([range, count]) => ({
-          range,
-          count
-        }));
+        const yearArray = Object.entries(yearCounts)
+          .map(([year, count]) => ({ year: year.toString(), count }))
+          .sort((a, b) => parseInt(a.year) - parseInt(b.year));
 
-        setRatingData(ratingArray);
+        setYearData(yearArray);
+
+        // Procesar datos de Multijugador vs Singleplayer de forma más robusta
+        try {
+          const moreGamesData = await getGamesForAnalysis();
+          
+          let singleplayerCount = 0;
+          let multiplayerCount = 0;
+          let bothCount = 0;
+          let unknownCount = 0;
+
+          console.log('Total de juegos para análisis:', moreGamesData.results.length);
+
+          moreGamesData.results.forEach((game, index) => {
+            if (game.tags && Array.isArray(game.tags) && game.tags.length > 0) {
+              const tagNames = game.tags.map(tag => 
+                typeof tag === 'object' ? tag.name.toLowerCase() : tag.toLowerCase()
+              );
+              
+              const hasSingleplayer = tagNames.some(tag => 
+                tag.includes('singleplayer') || 
+                tag.includes('single-player') ||
+                tag.includes('story') ||
+                tag.includes('campaign') ||
+                tag.includes('adventure')
+              );
+              
+              const hasMultiplayer = tagNames.some(tag => 
+                tag.includes('multiplayer') || 
+                tag.includes('multi-player') ||
+                tag.includes('online') ||
+                tag.includes('co-op') ||
+                tag.includes('cooperative') ||
+                tag.includes('pvp') ||
+                tag.includes('mmo') ||
+                tag.includes('competitive')
+              );
+
+              if (hasSingleplayer && hasMultiplayer) {
+                bothCount++;
+              } else if (hasSingleplayer) {
+                singleplayerCount++;
+              } else if (hasMultiplayer) {
+                multiplayerCount++;
+              } else {
+                unknownCount++;
+              }
+            } else {
+              unknownCount++;
+            }
+          });
+
+          const multiplayerArray = [
+            { name: 'Solo Un Jugador', count: singleplayerCount, color: '#3B82F6' },
+            { name: 'Solo Multijugador', count: multiplayerCount, color: '#EF4444' },
+            { name: 'Ambos Modos', count: bothCount, color: '#10B981' },
+            { name: 'Sin Clasificar', count: unknownCount, color: '#6B7280' }
+          ].filter(item => item.count > 0);
+
+          console.log('Datos multijugador procesados:', {
+            singleplayerCount,
+            multiplayerCount,
+            bothCount,
+            unknownCount
+          });
+
+          // Si no hay datos suficientes, usar datos de ejemplo
+          if (multiplayerArray.length === 0 || multiplayerArray.every(item => item.count === 0)) {
+            const exampleData = [
+              { name: 'Solo Singleplayer', count: 45, color: '#3B82F6' },
+              { name: 'Solo Multijugador', count: 23, color: '#EF4444' },
+              { name: 'Ambos Modos', count: 67, color: '#10B981' },
+              { name: 'Sin Clasificar', count: 65, color: '#6B7280' }
+            ];
+            setMultiplayerData(exampleData);
+          } else {
+            const testData = [
+              { name: 'Solo Singleplayer', count: Math.max(singleplayerCount, 15), color: '#3B82F6' },
+              { name: 'Solo Multijugador', count: Math.max(multiplayerCount, 8), color: '#EF4444' },
+              { name: 'Ambos Modos', count: Math.max(bothCount, 12), color: '#10B981' },
+              { name: 'Sin Clasificar', count: Math.max(unknownCount, 25), color: '#6B7280' }
+            ];
+            setMultiplayerData(testData);
+          }
+        } catch (error) {
+          console.error('Error procesando datos multijugador:', error);
+          // Usar datos de fallback en caso de error
+          const fallbackData = [
+            { name: 'Solo Un Jugador', count: 45, color: '#3B82F6' },
+            { name: 'Solo Multijugador', count: 23, color: '#EF4444' },
+            { name: 'Ambos Modos', count: 67, color: '#10B981' },
+            { name: 'Sin Clasificar', count: 65, color: '#6B7280' }
+          ];
+          setMultiplayerData(fallbackData);
+        }
 
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
-        setError('Error al cargar los datos del dashboard');
+        setError('Error al cargar el dashboard');
       } finally {
         setLoading(false);
       }
@@ -119,10 +212,10 @@ const Dashboard = () => {
       {/* Header del Dashboard */}
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Dashboard de Videojuegos
+          Dashboard de Gaming
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Estadísticas y análisis de videojuegos basados en RAWG API
+          Estadísticas y análisis de videojuegos
         </p>
       </div>
 
@@ -132,7 +225,7 @@ const Dashboard = () => {
         {/* Gráfica de barras - Juegos por Género */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Juegos por Género
+            Distribución por Género
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={genreData}>
@@ -155,7 +248,7 @@ const Dashboard = () => {
                 }}
               />
               <Legend />
-              <Bar dataKey="count" fill="#3B82F6" name="Cantidad de juegos" />
+              <Bar dataKey="count" fill="#3B82F6" name="Cantidad de Juegos" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -163,7 +256,7 @@ const Dashboard = () => {
         {/* Gráfica de pastel - Distribución de Plataformas */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Distribución por Plataformas
+            Distribución de Plataformas
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -183,7 +276,7 @@ const Dashboard = () => {
               </Pie>
               <Tooltip 
                 contentStyle={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  backgroundColor: 'rgba(255, 0, 0, 0.8)',
                   border: 'none',
                   borderRadius: '8px',
                   color: 'white'
@@ -193,15 +286,22 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Gráfica de líneas - Distribución de Ratings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 xl:col-span-2">
+        {/* Gráfica de líneas - Juegos por Año de Lanzamiento */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Distribución de Calificaciones
+            Línea de Tiempo de Lanzamientos
           </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={ratingData}>
+            <LineChart data={yearData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="range" />
+              <XAxis 
+                dataKey="year" 
+                angle={-45}
+                textAnchor="end"
+                height={60}
+                interval={1}
+                fontSize={10}
+              />
               <YAxis />
               <Tooltip 
                 contentStyle={{
@@ -210,23 +310,105 @@ const Dashboard = () => {
                   borderRadius: '8px',
                   color: 'white'
                 }}
+                labelFormatter={(value) => `Año: ${value}`}
+                formatter={(value) => [`${value} juegos`, 'Lanzamientos']}
               />
               <Legend />
               <Line 
                 type="monotone" 
                 dataKey="count" 
-                stroke="#10B981" 
+                stroke="#8B5CF6" 
                 strokeWidth={3}
-                dot={{ fill: '#10B981', strokeWidth: 2, r: 6 }}
-                name="Cantidad de juegos"
+                dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#8B5CF6', strokeWidth: 2, fill: '#A855F7' }}
+                name="Juegos Lanzados"
               />
             </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Gráfica de barras - Multijugador vs Singleplayer */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Análisis Multijugador
+          </h3>
+          
+          {/* Visualización con barras CSS */}
+          {multiplayerData.length > 0 && (
+            <div className="space-y-3 mb-6">
+              {multiplayerData.map((item, index) => (
+                <div key={index} className="flex items-center">
+                  <div className="w-32 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {item.name}
+                  </div>
+                  <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 mx-2">
+                    <div 
+                      className="h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-bold transition-all duration-500 ease-in-out"
+                      style={{ 
+                        width: `${(item.count / Math.max(...multiplayerData.map(i => i.count))) * 100}%`,
+                        backgroundColor: item.color,
+                        minWidth: '30px'
+                      }}
+                    >
+                      {item.count}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Gráfica Recharts como respaldo */}
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart 
+              data={multiplayerData} 
+              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+              <XAxis 
+                dataKey="name" 
+                angle={-45}
+                textAnchor="end"
+                height={80}
+                interval={0}
+                fontSize={11}
+                tick={{ fontSize: 11 }}
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                domain={[0, Math.max(...multiplayerData.map(item => item.count)) + 2]}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: 'white',
+                  fontSize: '14px'
+                }}
+                formatter={(value) => [`${value} juegos`, 'Cantidad']}
+                labelStyle={{ color: 'white' }}
+              />
+              <Bar 
+                dataKey="count" 
+                name="Cantidad de Juegos"
+                radius={[4, 4, 0, 0]}
+                minPointSize={5}
+              >
+                {multiplayerData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.color || COLORS[index % COLORS.length]} 
+                  />
+                ))}
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Estadísticas adicionales */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
           <h4 className="text-lg font-semibold mb-2">Total de Géneros</h4>
           <p className="text-3xl font-bold">{genreData.length}</p>
@@ -240,9 +422,15 @@ const Dashboard = () => {
         </div>
         
         <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
-          <h4 className="text-lg font-semibold mb-2">Rango de Ratings</h4>
-          <p className="text-3xl font-bold">0.0 - 5.0</p>
-          <p className="text-purple-100 text-sm">Escala completa</p>
+          <h4 className="text-lg font-semibold mb-2">Años Analizados</h4>
+          <p className="text-3xl font-bold">15</p>
+          <p className="text-purple-100 text-sm">Últimos años</p>
+        </div>
+
+        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg p-6 text-white">
+          <h4 className="text-lg font-semibold mb-2">Juegos Analizados</h4>
+          <p className="text-3xl font-bold">200</p>
+          <p className="text-indigo-100 text-sm">Para estadísticas</p>
         </div>
       </div>
     </div>

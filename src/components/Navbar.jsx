@@ -85,7 +85,7 @@ const Navbar = () => {
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
-              title={darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              title="Cambiar tema"
             >
               {darkMode ? (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
